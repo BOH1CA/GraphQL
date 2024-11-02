@@ -1,0 +1,156 @@
+/* Header Styles */
+#header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    background-color: #b3fcb9; 
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    width: 100%;
+}
+/* Body Styles */
+body {
+    font-family: 'Roboto';
+    margin: 5; 
+    padding: 20px;
+    background-color: #f4f4f4; 
+}
+/* Title Styles */
+#title {
+    font-size: 24px;
+    font-weight: bold; 
+    align-self: center;
+    margin-bottom: 20px;
+}
+/* Stat Page Styles */
+#graphPage {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+/* Cross Container Styles */
+#crossContainer {
+    display: flex;
+    justify-content: space-between; 
+    width: 100%;
+    margin-top: 20px;
+}
+/* User Info Styles */
+#userInfo {
+    height: fill;
+    background-color: #ffffff;
+    padding: 15px; 
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+/* User Info Header Styles */
+#userInfo h2 {
+    margin-bottom: 40px;
+    font-size: 20px;
+}
+/* User Info Span Styles */
+#userInfo span {
+    display: block;
+    margin: 5px;
+    margin-bottom: 8px; 
+    font-size: 16px;
+    color: #000000;
+}
+/* XP Progression Styles */
+#auditRatioDiv {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    margin: 20px;
+}
+/* XP Progression Header Styles */
+#auditRatioDiv h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+/* XP Progression Styles */
+#xpProgressionDiv {
+    background-color: #ffffff;
+    padding: 15px; 
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    margin: 20px;
+}
+/* XP Progression Header Styles */
+#xpProgressionDiv h2 {
+    padding-bottom: 60px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+#barGraphDiv {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding-top: 140px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+    align-items: flex-end;
+    height: 200px;
+    gap: 4px;
+}
+.bar-graph-container {
+    display: flex;
+    align-items: flex-end;
+    height: 150px;
+    gap: 5px;
+}
+.bar {
+    background-color: #800080;
+    position: relative;
+}
+.bar-label {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #000000;
+}
+/* Login Form Styles */
+#loginForm {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: auto;
+}
+/* Input Field Styles */
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+/* Button Styles */
+button {
+    background-color: #6f2a73;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px; 
+}
+/* Button Hover Effect */
+button:hover {
+    background-color: #f552ff; 
+}
