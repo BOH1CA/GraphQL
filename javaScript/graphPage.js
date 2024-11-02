@@ -2,9 +2,6 @@ import { createAuditRatioDiv } from './pieChart.js';
 import { createXpProgressionDiv } from './lineGraph.js';
 
 export function displayStats(userData, transactionsData) {
-    console.log('token:');
-    console.log(localStorage.getItem('jwToken'));
-
     // Creating the page DIV
     const page = document.createElement('div');
     page.id = 'graphPage';
