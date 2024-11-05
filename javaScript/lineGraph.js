@@ -47,16 +47,16 @@ function createLineGraph(userData) {
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
 
-    // Scale the XP values for the graph
+    // Scale the XP values and dates for the graph
     const maxXP = Math.max(...dataPoints.map(point => point.amount));
     const minXP = Math.min(...dataPoints.map(point => point.amount));
-    const minDate = new Date(Math.min(...dataPoints.map(point => point.date)));
-    const maxDate = new Date(Math.max(...dataPoints.map(point => point.date)));
+    const minDate = Math.min(...dataPoints.map(point => point.date.getTime()));
+    const maxDate = Math.max(...dataPoints.map(point => point.date.getTime()));
     const totalDuration = maxDate - minDate;
 
-    // Generate points for the line graph
-    const scaledPoints = dataPoints.map((point, index) => {
-        const x = (svgWidth - padding * 2) / (dataPoints.length - 1) * index + padding;
+    // Generate points for the line graph based on `createdAt` date
+    const scaledPoints = dataPoints.map(point => {
+        const x = padding + ((point.date.getTime() - minDate) / totalDuration) * (svgWidth - padding * 2);
         const y = svgHeight - padding - ((point.amount - minXP) / (maxXP - minXP) * (svgHeight - padding * 2));
         return { x, y, path: point.path };
     });
