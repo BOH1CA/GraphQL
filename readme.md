@@ -12,6 +12,6 @@ Tanel Soidla / TanelS
 Audit requirements: https://01.kood.tech/git/root/public/src/branch/master/subjects/graphql/audit
 
 Hosted on: https://boh1ca.github.io/GraphQL/
-
+You can login with intra User/Email and password.
 
 
