@@ -48,33 +48,40 @@ function createLineGraph(userData) {
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
 
-    // X-axis time scaling
+    // Scale the XP values for the graph
+    const maxXP = Math.max(...dataPoints.map(point => point.amount));
+    const minXP = Math.min(...dataPoints.map(point => point.amount));
     const minDate = dataPoints[0].date.getTime();
     const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
     const totalDuration = maxDate - minDate;
 
-    // Set a fixed Y position for all points (middle of the SVG)
-    const fixedY = svgHeight / 2;
-
-    // Generate points for the line graph based on `createdAt` date with a fixed Y
+    // Generate points for the line graph
     const scaledPoints = dataPoints.map(point => {
         const x = padding + ((point.date.getTime() - minDate) / totalDuration) * (svgWidth - padding * 2);
-        return { x, y: fixedY, path: point.path };
+        const y = svgHeight - padding - ((point.amount - minXP) / (maxXP - minXP) * (svgHeight - padding * 2));
+        return { x, y, path: point.path };
     });
 
-    // Create the path for the line
-    const linePath = scaledPoints.map((point, index) => {
-        return index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`;
+    // Create the path for the smooth line
+    const linePath = scaledPoints.map((point, index, arr) => {
+        // Use cubic bezier to create smooth curves
+        if (index === 0) return `M ${point.x} ${point.y}`;
+        const prev = arr[index - 1];
+        const cp1x = prev.x + (point.x - prev.x) / 2;
+        const cp1y = prev.y;
+        const cp2x = point.x - (point.x - prev.x) / 2;
+        const cp2y = point.y;
+        return `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${point.x} ${point.y}`;
     }).join(' ');
 
-    // Create the line element
+    // Create the line element with smooth curve
     const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
     line.setAttribute("d", linePath);
-    line.setAttribute("stroke", "black");
+    line.setAttribute("stroke", "red");
     line.setAttribute("fill", "none");
-    line.setAttribute("stroke-width", "2");
+    line.setAttribute("stroke-width", "3");
 
-    // Append the line to the SVG
+    // Append the smooth line to the SVG
     svg.appendChild(line);
 
     // Create a tooltip
@@ -86,13 +93,13 @@ function createLineGraph(userData) {
     tooltip.style.display = 'none';
     document.body.appendChild(tooltip);
 
-    // Add round points for each data point
+    // Add larger round points for each data point
     scaledPoints.forEach(point => {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", point.x);
         circle.setAttribute("cy", point.y);
-        circle.setAttribute("r", 4);
-        circle.setAttribute("fill", "black");
+        circle.setAttribute("r", 6);  // Increase radius for better visibility
+        circle.setAttribute("fill", "red");
         svg.appendChild(circle);
 
         // Mouseover event to show tooltip
@@ -113,9 +120,9 @@ function createLineGraph(userData) {
     // Draw the x-axis
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     xAxis.setAttribute("x1", padding);
-    xAxis.setAttribute("y1", fixedY);
+    xAxis.setAttribute("y1", svgHeight - padding);
     xAxis.setAttribute("x2", svgWidth - padding);
-    xAxis.setAttribute("y2", fixedY);
+    xAxis.setAttribute("y2", svgHeight - padding);
     xAxis.setAttribute("stroke", "black");
     xAxis.setAttribute("stroke-width", "1");
     svg.appendChild(xAxis);
@@ -132,4 +139,3 @@ function createLineGraph(userData) {
 
     return svg;
 }
-
