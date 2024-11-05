@@ -48,18 +48,18 @@ function createLineGraph(userData) {
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
 
-    // Scale the XP values and dates for the graph
-    const maxXP = Math.max(...dataPoints.map(point => point.amount));
-    const minXP = Math.min(...dataPoints.map(point => point.amount));
+    // X-axis time scaling
     const minDate = dataPoints[0].date.getTime();
     const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
     const totalDuration = maxDate - minDate;
 
-    // Generate points for the line graph based on `createdAt` date
+    // Set a fixed Y position for all points (middle of the SVG)
+    const fixedY = svgHeight / 2;
+
+    // Generate points for the line graph based on `createdAt` date with a fixed Y
     const scaledPoints = dataPoints.map(point => {
         const x = padding + ((point.date.getTime() - minDate) / totalDuration) * (svgWidth - padding * 2);
-        const y = svgHeight - padding - ((point.amount - minXP) / (maxXP - minXP) * (svgHeight - padding * 2));
-        return { x, y, path: point.path };
+        return { x, y: fixedY, path: point.path };
     });
 
     // Create the path for the line
@@ -97,7 +97,6 @@ function createLineGraph(userData) {
 
         // Mouseover event to show tooltip
         circle.addEventListener('mouseover', (event) => {
-            // Get the last part of the path
             const pathName = point.path.split('/').pop();
             tooltip.innerText = `${pathName}`;
             tooltip.style.left = `${event.pageX + 5}px`;
@@ -114,9 +113,9 @@ function createLineGraph(userData) {
     // Draw the x-axis
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     xAxis.setAttribute("x1", padding);
-    xAxis.setAttribute("y1", svgHeight - padding);
+    xAxis.setAttribute("y1", fixedY);
     xAxis.setAttribute("x2", svgWidth - padding);
-    xAxis.setAttribute("y2", svgHeight - padding);
+    xAxis.setAttribute("y2", fixedY);
     xAxis.setAttribute("stroke", "black");
     xAxis.setAttribute("stroke-width", "1");
     svg.appendChild(xAxis);
@@ -133,3 +132,4 @@ function createLineGraph(userData) {
 
     return svg;
 }
+
