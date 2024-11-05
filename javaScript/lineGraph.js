@@ -1,3 +1,31 @@
+export function createXpProgressionDiv(userData) {
+    // Create a new div for XP progression
+    const xpProgressionDiv = document.createElement('div');
+    xpProgressionDiv.id = 'xpProgressionDiv';
+
+    // Calculate the total XP using userData.xps
+    const totalXP = userData.xps.reduce((sum, xp) => sum + xp.amount, 0);
+
+    // Convert total XP to KB and round it
+    const totalXP_KB = Math.ceil(totalXP / 1000);
+
+    // Create a heading to display the total XP in bold
+    const xpHeader = document.createElement('h2');
+    xpHeader.innerText = 'Total XP: ' + totalXP_KB + ' KB';
+    xpHeader.style.fontWeight = 'bold';
+
+    // Append the header to the XP progression div
+    xpProgressionDiv.appendChild(xpHeader);
+
+    // Create SVG for the line graph
+    const svg = createLineGraph(userData);
+
+    // Append the SVG to the XP progression div
+    xpProgressionDiv.appendChild(svg);
+
+    return xpProgressionDiv;
+}
+
 function createLineGraph(userData) {
     const svgWidth = 400;
     const svgHeight = 200;
