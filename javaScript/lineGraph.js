@@ -2,22 +2,30 @@ export function createXpProgressionDiv(userData) {
     // Create a new div for XP progression
     const xpProgressionDiv = document.createElement('div');
     xpProgressionDiv.id = 'xpProgressionDiv';
+
     // Calculate the total XP using userData.xps
     const totalXP = userData.xps.reduce((sum, xp) => sum + xp.amount, 0);
+
     // Convert total XP to KB and round it
     const totalXP_KB = Math.ceil(totalXP / 1000);
+
     // Create a heading to display the total XP in bold
     const xpHeader = document.createElement('h2');
     xpHeader.innerText = 'Total XP: ' + totalXP_KB + ' KB';
     xpHeader.style.fontWeight = 'bold';
+
     // Append the header to the XP progression div
     xpProgressionDiv.appendChild(xpHeader);
+
     // Create SVG for the line graph
     const svg = createLineGraph(userData);
+
     // Append the SVG to the XP progression div
     xpProgressionDiv.appendChild(svg);
+
     return xpProgressionDiv;
 }
+
 function createLineGraph(userData) {
     const svgWidth = 400;
     const svgHeight = 200;
@@ -26,14 +34,13 @@ function createLineGraph(userData) {
     // Map the progresses to a more usable format
     const progressesMap = new Map(userData.progresses.map(p => [p.path, new Date(p.createdAt)]));
 
-    // Create an array for the points and sort them by date
+    // Create an array for the points
     const dataPoints = userData.xps
         .map(xp => {
             const createdAt = progressesMap.get(xp.path);
             return createdAt ? { date: createdAt, amount: xp.amount, path: xp.path } : null;
         })
-        .filter(point => point !== null)
-        .sort((a, b) => a.date - b.date); // Sort by date, from earliest to latest
+        .filter(point => point !== null);
 
     // Create the SVG element
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -43,9 +50,11 @@ function createLineGraph(userData) {
     // Scale the XP values for the graph
     const maxXP = Math.max(...dataPoints.map(point => point.amount));
     const minXP = Math.min(...dataPoints.map(point => point.amount));
-    const totalDuration = new Date(Math.max(...dataPoints.map(point => point.date))) - new Date(Math.min(...dataPoints.map(point => point.date)));
+    const minDate = new Date(Math.min(...dataPoints.map(point => point.date)));
+    const maxDate = new Date(Math.max(...dataPoints.map(point => point.date)));
+    const totalDuration = maxDate - minDate;
 
-    // Generate scaled points for the line graph
+    // Generate points for the line graph
     const scaledPoints = dataPoints.map((point, index) => {
         const x = (svgWidth - padding * 2) / (dataPoints.length - 1) * index + padding;
         const y = svgHeight - padding - ((point.amount - minXP) / (maxXP - minXP) * (svgHeight - padding * 2));
@@ -63,6 +72,8 @@ function createLineGraph(userData) {
     line.setAttribute("stroke", "black");
     line.setAttribute("fill", "none");
     line.setAttribute("stroke-width", "2");
+
+    // Append the line to the SVG
     svg.appendChild(line);
 
     // Create a tooltip
@@ -85,6 +96,7 @@ function createLineGraph(userData) {
 
         // Mouseover event to show tooltip
         circle.addEventListener('mouseover', (event) => {
+            // Get the last part of the path
             const pathName = point.path.split('/').pop();
             tooltip.innerText = `${pathName}`;
             tooltip.style.left = `${event.pageX + 5}px`;
