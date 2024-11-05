@@ -31,40 +31,38 @@ function createLineGraph(userData) {
     const svgHeight = 200;
     const padding = 20;
 
-    // Map the progresses to a more usable format
+    // Map progresses to use createdAt for sorting and amount for y-axis values
     const progressesMap = new Map(userData.progresses.map(p => [p.path, new Date(p.createdAt)]));
 
-    // Create an array for the points and sort them by date
+    // Create and sort data points by date
     const dataPoints = userData.xps
         .map(xp => {
             const createdAt = progressesMap.get(xp.path);
             return createdAt ? { date: createdAt, amount: xp.amount, path: xp.path } : null;
         })
         .filter(point => point !== null)
-        .sort((a, b) => a.date - b.date);  // Sort by date in ascending order
+        .sort((a, b) => a.date - b.date);  // Sort by date
 
     // Create the SVG element
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
 
-    // Scale the XP values for the graph
-    const maxXP = Math.max(...dataPoints.map(point => point.amount));
-    const minXP = Math.min(...dataPoints.map(point => point.amount));
+    // Find min and max for x-axis (date) and y-axis (XP amount)
     const minDate = dataPoints[0].date.getTime();
     const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
-    const totalDuration = maxDate - minDate;
+    const minXP = Math.min(...dataPoints.map(point => point.amount));
+    const maxXP = Math.max(...dataPoints.map(point => point.amount));
 
-    // Generate points for the line graph
+    // Scale points on both axes
     const scaledPoints = dataPoints.map(point => {
-        const x = padding + ((point.date.getTime() - minDate) / totalDuration) * (svgWidth - padding * 2);
+        const x = padding + ((point.date.getTime() - minDate) / (maxDate - minDate)) * (svgWidth - padding * 2);
         const y = svgHeight - padding - ((point.amount - minXP) / (maxXP - minXP) * (svgHeight - padding * 2));
         return { x, y, path: point.path };
     });
 
-    // Create the path for the smooth line
+    // Generate a smooth line path with Bezier curves
     const linePath = scaledPoints.map((point, index, arr) => {
-        // Use cubic bezier to create smooth curves
         if (index === 0) return `M ${point.x} ${point.y}`;
         const prev = arr[index - 1];
         const cp1x = prev.x + (point.x - prev.x) / 2;
@@ -74,35 +72,35 @@ function createLineGraph(userData) {
         return `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${point.x} ${point.y}`;
     }).join(' ');
 
-    // Create the line element with smooth curve
+    // Create and style the line element
     const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
     line.setAttribute("d", linePath);
-    line.setAttribute("stroke", "red");
+    line.setAttribute("stroke", "blue");  // Change color as needed
     line.setAttribute("fill", "none");
-    line.setAttribute("stroke-width", "3");
+    line.setAttribute("stroke-width", "2");
 
     // Append the smooth line to the SVG
     svg.appendChild(line);
 
-    // Create a tooltip
+    // Create a tooltip for showing details
     const tooltip = document.createElement('div');
     tooltip.style.position = 'absolute';
     tooltip.style.backgroundColor = 'white';
-    tooltip.style.border = '2px solid black';
+    tooltip.style.border = '1px solid black';
     tooltip.style.padding = '5px';
     tooltip.style.display = 'none';
     document.body.appendChild(tooltip);
 
-    // Add larger round points for each data point
+    // Add points on the line with larger, colored circles
     scaledPoints.forEach(point => {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", point.x);
         circle.setAttribute("cy", point.y);
-        circle.setAttribute("r", 6);  // Increase radius for better visibility
-        circle.setAttribute("fill", "red");
+        circle.setAttribute("r", 5);  // Adjust the size as desired
+        circle.setAttribute("fill", "blue");  // Match line color
         svg.appendChild(circle);
 
-        // Mouseover event to show tooltip
+        // Add mouseover for tooltip
         circle.addEventListener('mouseover', (event) => {
             const pathName = point.path.split('/').pop();
             tooltip.innerText = `${pathName}`;
@@ -111,30 +109,27 @@ function createLineGraph(userData) {
             tooltip.style.display = 'block';
         });
 
-        // Mouseout event to hide tooltip
+        // Hide tooltip on mouseout
         circle.addEventListener('mouseout', () => {
             tooltip.style.display = 'none';
         });
     });
 
-    // Draw the x-axis
+    // Draw x-axis and y-axis lines
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     xAxis.setAttribute("x1", padding);
     xAxis.setAttribute("y1", svgHeight - padding);
     xAxis.setAttribute("x2", svgWidth - padding);
     xAxis.setAttribute("y2", svgHeight - padding);
     xAxis.setAttribute("stroke", "black");
-    xAxis.setAttribute("stroke-width", "1");
     svg.appendChild(xAxis);
 
-    // Draw the y-axis
     const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     yAxis.setAttribute("x1", padding);
     yAxis.setAttribute("y1", padding);
     yAxis.setAttribute("x2", padding);
     yAxis.setAttribute("y2", svgHeight - padding);
     yAxis.setAttribute("stroke", "black");
-    yAxis.setAttribute("stroke-width", "1");
     svg.appendChild(yAxis);
 
     return svg;
