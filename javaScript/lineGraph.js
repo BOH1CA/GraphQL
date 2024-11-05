@@ -1,31 +1,3 @@
-export function createXpProgressionDiv(userData) {
-    // Create a new div for XP progression
-    const xpProgressionDiv = document.createElement('div');
-    xpProgressionDiv.id = 'xpProgressionDiv';
-
-    // Calculate the total XP using userData.xps
-    const totalXP = userData.xps.reduce((sum, xp) => sum + xp.amount, 0);
-
-    // Convert total XP to KB and round it
-    const totalXP_KB = Math.ceil(totalXP / 1000);
-
-    // Create a heading to display the total XP in bold
-    const xpHeader = document.createElement('h2');
-    xpHeader.innerText = 'Total XP: ' + totalXP_KB + ' KB';
-    xpHeader.style.fontWeight = 'bold';
-
-    // Append the header to the XP progression div
-    xpProgressionDiv.appendChild(xpHeader);
-
-    // Create SVG for the line graph
-    const svg = createLineGraph(userData);
-
-    // Append the SVG to the XP progression div
-    xpProgressionDiv.appendChild(svg);
-
-    return xpProgressionDiv;
-}
-
 function createLineGraph(userData) {
     const svgWidth = 400;
     const svgHeight = 200;
@@ -34,13 +6,14 @@ function createLineGraph(userData) {
     // Map the progresses to a more usable format
     const progressesMap = new Map(userData.progresses.map(p => [p.path, new Date(p.createdAt)]));
 
-    // Create an array for the points
+    // Create an array for the points and sort them by date
     const dataPoints = userData.xps
         .map(xp => {
             const createdAt = progressesMap.get(xp.path);
             return createdAt ? { date: createdAt, amount: xp.amount, path: xp.path } : null;
         })
-        .filter(point => point !== null);
+        .filter(point => point !== null)
+        .sort((a, b) => a.date - b.date);  // Sort by date in ascending order
 
     // Create the SVG element
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -50,8 +23,8 @@ function createLineGraph(userData) {
     // Scale the XP values and dates for the graph
     const maxXP = Math.max(...dataPoints.map(point => point.amount));
     const minXP = Math.min(...dataPoints.map(point => point.amount));
-    const minDate = Math.min(...dataPoints.map(point => point.date.getTime()));
-    const maxDate = Math.max(...dataPoints.map(point => point.date.getTime()));
+    const minDate = dataPoints[0].date.getTime();
+    const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
     const totalDuration = maxDate - minDate;
 
     // Generate points for the line graph based on `createdAt` date
